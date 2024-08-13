@@ -1,55 +1,62 @@
+import React, { useState, useEffect } from 'react';
 import { Image, StyleSheet, Platform } from 'react-native';
+import { Client } from '@notionhq/client';
 
 import { HelloWave } from '@/components/HelloWave';
+import { Collapsible } from '@/components/Collapsible';
+import { ExternalLink } from '@/components/ExternalLink';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { DatabaseObjectResponse, PageObjectResponse, PartialDatabaseObjectResponse, PartialPageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
+
+// Initialize Notion client
+const notion = new Client({ auth: process.env.EXPO_PUBLIC_NOTION_API_KEY });
+const databaseId = process.env.EXPO_PUBLIC_NOTION_DATABASE_ID;
 
 export default function HomeScreen() {
+  const [inventoryItems, setInventoryItems] = useState<PageObjectResponse[] | (PageObjectResponse | PartialPageObjectResponse | PartialDatabaseObjectResponse | DatabaseObjectResponse)[]>([]);
+
+  useEffect(() => {
+    fetchInventoryItems();
+  }, []);
+
+  const fetchInventoryItems = async () => {
+    try {
+      const response = await notion.databases.query({ database_id: databaseId! });
+      setInventoryItems(response.results);
+    } catch (error) {
+      console.error('Error fetching inventory items:', error);
+    }
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
       headerImage={
         <Image
-          source={require('@/assets/images/partial-react-logo.png')}
+          source={require('@/assets/images/inventory.png')}
           style={styles.reactLogo}
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
+        <ThemedText type="title">Inventories</ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
+        {inventoryItems.map((item) => (
+          <Collapsible key={item.id} title={item.properties.Name.title[0].plain_text}>
+            <ThemedText>Quantity: {item.properties.Quantity.number}</ThemedText>
+            <ThemedText style={styles.description}>
+            Description: {item.properties.Description.rich_text[0]?.plain_text || 'No description'}
+          </ThemedText>
+          <ThemedText style={styles.tagsTitle}>Tags:</ThemedText>
+          {renderTags(item.properties.Tags.multi_select)}
+          </Collapsible>
+        ))}
       </ThemedView>
     </ParallaxScrollView>
   );
 }
-
 const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
@@ -67,4 +74,44 @@ const styles = StyleSheet.create({
     left: 0,
     position: 'absolute',
   },
+  quantity: {
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  description: {
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  tagsTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  tagContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  tag: {
+    backgroundColor: '#007AFF',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  tagText: {
+    color: 'white',
+    fontSize: 12,
+  },
 });
+
+const renderTags = (tags) => {
+  return (
+    <ThemedView style={styles.tagContainer}>
+      {tags.map((tag, index) => (
+        <ThemedView key={index} style={styles.tag}>
+          <ThemedText style={styles.tagText}>{tag.name}</ThemedText>
+        </ThemedView>
+      ))}
+    </ThemedView>
+  );
+};
