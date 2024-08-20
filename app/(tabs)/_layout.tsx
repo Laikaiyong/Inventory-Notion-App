@@ -16,8 +16,12 @@ export default function TabLayout() {
       }}>
       <Tabs.Screen
         name="index"
+        listeners={({ navigation }) => ({
+          blur: () => navigation.setParams({ screen: undefined }),
+        })}
         options={{
           title: 'Inventory',
+          unmountOnBlur: true,
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
           ),
@@ -25,8 +29,12 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="gallery"
+        listeners={({ navigation }) => ({
+          blur: () => navigation.setParams({ screen: undefined }),
+        })}
         options={{
           title: 'Images',
+          unmountOnBlur: true,
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'image' : 'image-outline'} color={color} />
           ),

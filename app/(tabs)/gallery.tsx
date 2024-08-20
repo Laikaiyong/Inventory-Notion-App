@@ -33,8 +33,7 @@ const Item = ({ item }: any) => {
           height: windowHeight / 7,
         }}
         source={{
-          uri:
-            item.properties.Image.files[0]?.external.url,
+          uri: item.properties.Image.files[0]?.external.url,
         }}
       />
     </ThemedView>
