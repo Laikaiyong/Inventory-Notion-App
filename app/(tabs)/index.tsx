@@ -253,7 +253,7 @@ const renderTags = (tags: any) => {
   return (
     <ThemedView style={styles.tagContainer}>
       {tags.map((tag: any, index: number) => (
-        <ThemedView key={index} style={styles.tag}>
+        <ThemedView key={index} style={[styles.tag, { backgroundColor: tag.color }]}>
           <ThemedText style={styles.tagText}>{tag.name}</ThemedText>
         </ThemedView>
       ))}
