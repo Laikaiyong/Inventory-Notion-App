@@ -72,15 +72,15 @@ const InventoryForm = ({
         selectedItems={tags}
         selectText="Select Tags"
         searchInputPlaceholderText="Search Tags..."
-        tagRemoveIconColor="#CCC"
-        tagBorderColor="#CCC"
-        tagTextColor="#CCC"
-        selectedItemTextColor="#CCC"
-        selectedItemIconColor="#CCC"
+        tagRemoveIconColor="#000"
+        tagBorderColor="#000"
+        tagTextColor="#000"
+        selectedItemTextColor="#000"
+        selectedItemIconColor="#000"
         itemTextColor="#000"
         displayKey="name"
-        searchInputStyle={{ color: "#CCC" }}
-        submitButtonColor="#CCC"
+        searchInputStyle={{ color: "#000" }}
+        submitButtonColor="#000"
         submitButtonText="Submit"
       />
       <TextInput
